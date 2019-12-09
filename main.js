@@ -1,40 +1,39 @@
 'use strict';
 
-const apiKey = "0c087c7858c54834abe4ba522e17b108";
+// Personal Access Token
+const authToken = "341eb0459026c2b8df073ee7a2726b2d489022a8";
 
-//base URL
+// Base URL
 const searchURL = 'https://api.github.com';
 
-function formatQueryParams(params) {
-    const queryItems = Object.keys(params)
-      .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
-    return queryItems.join('&');
-}
-
-
 function displayResults(responseJson) {
-    // if there are previous results, remove them
-    console.log(responseJson);
+    // if there are previous results displayed and/or an error message, remove them
+    $('#results-list').empty();
+    $('#js-error-message').empty();
+    // Add a list item for each Repo and associated url
+    for (let i = 0; i < responseJson.length; i++) {
+        $('#results-list').append(
+          `<li><h3> ${responseJson[i].full_name} </h3>
+          <p>
+            <a href="${responseJson[i].html_url}">${responseJson[i].html_url}</a>
+          </p>        
+          </li>`
+        )};
+      //display the results section  
+      $('#results').removeClass('hidden');
 }
 
 function getRepos(query) {
-    console.log(`getRepos function is running with ${query} as an argument`)
-    const params = {
-      q: query,
-      language: "en",
+    const url = `${searchURL}/users/${query}/repos`;
+  
+    const options = {
+        headers: new Headers({
+            "Accept": "application/vnd.github.v3+json",
+            "Authorization": authToken,
+        })
     };
-
-    const queryString = formatQueryParams(params)
-    const url = searchURL + '?' + queryString;
   
-    console.log(url);
-  
-    // const options = {
-    //   headers: new Headers({
-    //     "X-Api-Key": apiKey})
-    // };
-  
-    fetch(url)
+    fetch(url, options)
       .then(response => {
         if (response.ok) {
           return response.json();
@@ -53,8 +52,8 @@ function watchForm() {
       event.preventDefault();
       const userName = $('#js-search-term').val();
       getRepos(userName);
-      console.log(`watchForm ran and passed ${userName} as an argument to getRepos`)
     });
   }
   
+  // when the browser loads, call the watchForm function to listen for user events
   $(watchForm);

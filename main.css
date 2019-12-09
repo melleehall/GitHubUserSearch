@@ -7,3 +7,8 @@ body {
     background-color: black;
     padding-left: 20px;
 }
+
+#js-error-message {
+    color: red;
+    text-decoration: underline;
+}
